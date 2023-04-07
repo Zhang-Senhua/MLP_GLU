@@ -1,2 +1,9 @@
 DATASET/
 DATASET_TEST/
+Model_GLU_X_Y/*.pkl
+Model_GLU_Y_X/model_pkl_Y_to_X_GLU/*.pkl
+Model_RES_X_Y/model_pkl_X_to_Y_RES/*.pkl
+__pycache__/MLP_Res.cpython-38.pyc
+Model_GLU_X_Y/model_pkl_X_to_Y_GLU/GLU_5_961e-05_80_2000_0.pkl
+Model_RES_Y_X/model_pkl_Y_to_X_RES/RES_96_51e-05_80_2000_0.pkl
+__pycache__/MLP_GLU.cpython-38.pyc
