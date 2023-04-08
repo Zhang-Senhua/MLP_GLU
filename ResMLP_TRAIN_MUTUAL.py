@@ -21,7 +21,7 @@ output_size_mag=96
 output_size_mag=torch.tensor(output_size_mag)
 hidden_size_mag=512 #隐藏层的节点数量
 hidden_size_mag=torch.tensor(hidden_size_mag)
-num_layers_mag=4#隐藏层数量
+num_layers_mag=5#隐藏层数量
 num_layers_mag=torch.tensor(num_layers_mag)
 
 input_size_position=96
@@ -36,12 +36,12 @@ num_layers_position=torch.tensor(num_layers_position)
 test_loss_select=0
 flag=0
 batch_size =80
-learning_rate = 0.001
+learning_rate = 0.0001
 epochs =2000
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")#device = torch.device('cpu')#('cuda:0')
 print(device)
 file_flag='RES_MUTUAL'
-the = 0.01
+the = 0.1
 count_filename = "count.txt"
 Dir='Model_RES_MUTUAL/'
 loss_folder='Model_RRES_MUTUAL/loss_RES_MUTUAL/'
@@ -68,21 +68,33 @@ if not os.path.isfile('model_mutual_RES_Y_X.txt'):
     open('model_mutual_RES_Y_X.txt', 'w').close()
 if not os.path.isfile('model_mutual_RES_count.txt'):
     open('model_mutual_RES_count.txt', 'w').close()
-if count>=1:
-    # 读取 model.txt 文件的最后一行，获取上次运行的 pkl 文件名
-    with open('model_mutual_RES_X_Y.txt', 'r') as f:
-        linesff = f.readlines()
-        if linesff:
-            last_lineff = linesff[-1].strip()
-        else:
-            last_lineff = ""
-    # 读取 model.txt 文件的最后一行，获取上次运行的 pkl 文件名
-    with open('model_mutual_RES_Y_X.txt', 'r') as f:
+# if count>=1:
+#     # 读取 model.txt 文件的最后一行，获取上次运行的 pkl 文件名
+#     with open('model_mutual_RES_X_Y.txt', 'r') as f:
+#         linesff = f.readlines()
+#         if linesff:
+#             last_lineff = linesff[-1].strip()
+#         else:
+#             last_lineff = ""
+#     # 读取 model.txt 文件的最后一行，获取上次运行的 pkl 文件名
+#     with open('model_mutual_RES_Y_X.txt', 'r') as f:
+#         linescc = f.readlines()
+#         if linescc:
+#             last_linecc = linescc[-1].strip()
+#         else:
+#             last_linecc = ""
+with open('model_Y_to_X_RES.txt', 'r') as f:
         linescc = f.readlines()
         if linescc:
             last_linecc = linescc[-1].strip()
         else:
-            last_linecc = ""
+            last_linecc = ""        
+with open('model_X_to_Y_RES.txt', 'r') as f:
+        linesff = f.readlines()
+        if linesff:
+            last_lineff = linesff[-1].strip()
+        else:
+            last_lineff = ""        
 l = 1 # 厚度
 d = 6# 直径
 fr = 18500  # 剩余磁场
@@ -119,16 +131,16 @@ test = list(enumerate(test_dataloader))
 
 net_mag =  ResMLP(input_size_mag, output_size_mag, hidden_size_mag, num_layers_mag,device).to(device) #96->5
 net_location = ResMLP(input_size_position, output_size_position, hidden_size_position, num_layers_position,device).to(device) #96->5
-if count>=1:
-        net_mag.load_state_dict(torch.load(last_lineff))
-        net_location.load_state_dict(torch.load(last_linecc))
+#if count>=1:
+net_mag.load_state_dict(torch.load(last_lineff))
+net_location.load_state_dict(torch.load(last_linecc))
 
 
 optimizer_mag = optim.Adam(net_mag.parameters(),lr=learning_rate) ##根据实际的曲线去调整，看看那个过拟合,weight_decay=0.001
 optimizer_location = optim.Adam(net_location.parameters(),lr=learning_rate)#,weight_decay=0.005
-criteon = nn.MSELoss().to(device)
+criteon_location = nn.MSELoss().to(device)
 
-#criteon = nn.SmoothL1Loss().to(device)
+criteon = nn.SmoothL1Loss().to(device)
 
 # x_new = x_new.T
 
@@ -163,17 +175,17 @@ for epoch in range(epochs):
         if data.size()[0] == predict_the.size()[0]:
             # x_input = torch.cat((data, target), dim=1).float()
             output = net_location(data,device).requires_grad_(True).to(device)
-            predict_1 = net_mag(target,device).requires_grad_(True).to(device)
+            predict_1 = net_mag(output,device).requires_grad_(True).to(device)
             # predict_y = predict_1.repeat(data.size()[0], 1).requires_grad_(True)
-            loss_location = criteon(output,target)
-            loss_mag = criteon(predict_1, data)
+            loss_location = criteon_location(output,target)
+            loss_mag = criteon(predict_1,data)
             loss = loss_location +the* loss_mag
-            optimizer_mag.zero_grad()
+            #optimizer_mag.zero_grad()
             optimizer_location.zero_grad()
             #loss_location.backward(retain_graph=True)
             #loss_mag.backward(retain_graph=True)
             loss.backward(retain_graph=True)
-            optimizer_mag.step()
+            #optimizer_mag.step()
             optimizer_location.step()
             #total_loss = criteon(fin_out,target)
             total_loss = criteon(output, target)
@@ -186,17 +198,17 @@ for epoch in range(epochs):
         # 最后的batch不足batch_size时
         else:
             output = net_location(data,device).requires_grad_(True).to(device)
-            predict_1 = net_mag(target,device).requires_grad_(True).to(device)
+            predict_1 = net_mag(output,device).requires_grad_(True).to(device)
             # predict_y = predict_1.repeat(data.size()[0], 1).requires_grad_(True)
-            loss_location = criteon(output,target)
+            loss_location = criteon_location(output,target)
             loss_mag = criteon(predict_1, data)
             loss = loss_location +the* loss_mag
-            optimizer_mag.zero_grad()
+            #optimizer_mag.zero_grad()
             optimizer_location.zero_grad()
             #loss_location.backward(retain_graph=True)
             #loss_mag.backward(retain_graph=True)
             loss.backward(retain_graph=True)
-            optimizer_mag.step()
+           # optimizer_mag.step()
             optimizer_location.step()
             #total_loss = criteon(fin_out,target)
             total_loss = criteon(output, target)
@@ -229,10 +241,10 @@ for epoch in range(epochs):
 
 
             output = net_location(test_data,device).requires_grad_(True).to(device)
-            predict_1 = net_mag(test_target,device).requires_grad_(True).to(device)
+            predict_1 = net_mag(output,device).requires_grad_(True).to(device)
             # predict_y = predict_1.repeat(,devicedata.size()[0], 1).requires_grad_(True)
 
-            test_loss = criteon(output, test_target)
+            test_loss = criteon_location(output, test_target)
             losstest = np.append(losstrain, test_loss.item())
             total_loss_x = criteon(predict_1, test_data)
             loss_zhengzehua =the* total_loss_x+test_loss 
@@ -241,10 +253,10 @@ for epoch in range(epochs):
 
         else:
             output = net_location(test_data,device).requires_grad_(True).to(device)
-            predict_1 = net_mag(test_target,device).requires_grad_(True).to(device)
+            predict_1 = net_mag(output,device).requires_grad_(True).to(device)
             # predict_y = predict_1.repeat(data.size()[0], 1).requires_grad_(True)
 
-            test_loss = criteon(output, test_target)
+            test_loss = criteon_location(output, test_target)
             losstest = np.append(losstrain, test_loss.item())
             total_loss_x = criteon(predict_1, test_data)
             loss_zhengzehua =the* total_loss_x+test_loss 
