@@ -14,7 +14,7 @@ from tqdm import tqdm, trange
 import os
 #CNN+MLP混合
 batch_size =80
-learning_rate = 0.00001
+learning_rate = 0.001
 epochs =2000
 
 flag=0
@@ -90,8 +90,8 @@ if count>=1:
         net_glu_96_5 .load_state_dict(torch.load(last_linecc))
 
 optimizer_c = optim.Adam(net_glu_96_5.parameters(),lr=learning_rate)#,weight_decay=0.005,weight_decay=0.5
-criteon = nn.MSELoss().to(device)
-#criteon =nn.SmoothL1Loss().to(device)
+#criteon = nn.MSELoss().to(device)
+criteon =nn.SmoothL1Loss().to(device)
 # x_new = x_new.T
 g = 0
 m = 0

@@ -7,3 +7,9 @@ __pycache__/MLP_Res.cpython-38.pyc
 Model_GLU_X_Y/model_pkl_X_to_Y_GLU/GLU_5_961e-05_80_2000_0.pkl
 Model_RES_Y_X/model_pkl_Y_to_X_RES/RES_96_51e-05_80_2000_0.pkl
 __pycache__/MLP_GLU.cpython-38.pyc
+Model_RES_MUTUAL/model_pkl_RES_MUTUAL/MUTUAL_Y_X_0.001_80_2000_0_0.1.pkl
+.gitignore
+Model_RES_MUTUAL/model_pkl_RES_MUTUAL/MUTUAL_X_Y_0.001_80_2000_0_0.1.pkl
+Model_RES_Y_X/loss_Y_to_X_RES/1e-05_80_2000_0.jpg
+Model_RES_Y_X/loss_Y_to_X_RES/位置误差test1e-05_80_2000_0.txt
+Model_RES_Y_X/loss_Y_to_X_RES/位置误差train1e-05_80_2000_0.txt

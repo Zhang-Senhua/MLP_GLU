@@ -14,7 +14,7 @@ import math
 from tqdm import tqdm, trange
 import os
 #CNN+MLP混合
-batch_size =80
+batch_size =40
 learning_rate = 0.0001
 epochs =2000
 
@@ -23,9 +23,9 @@ input_size=5
 input_size=torch.tensor(input_size)
 output_size=96
 output_size=torch.tensor(output_size)
-hidden_size=4000 #隐藏层的节点数量
+hidden_size=5120#隐藏层的节点数量
 hidden_size=torch.tensor(hidden_size)
-num_layers=6#隐藏层数量
+num_layers=3#隐藏层数量
 num_layers=torch.tensor(num_layers)
 test_loss_select=0
 Dir='Model_RES_X_Y/'
@@ -98,9 +98,9 @@ net_RES_5_96= ResMLP(input_size, output_size, hidden_size, num_layers,device).to
 if count>=1:
         net_RES_5_96 .load_state_dict(torch.load(last_linecc))
 
-optimizer_c = optim.Adam(net_RES_5_96.parameters(),lr=learning_rate)#,weight_decay=0.005,weight_decay=0.5
-criteon = nn.MSELoss().to(device)
-#criteon =nn.SmoothL1Loss().to(device)
+optimizer_c = optim.Adam(net_RES_5_96.parameters(),lr=learning_rate,weight_decay=0.2)#,weight_decay=0.005,weight_decay=0.5
+#criteon = nn.MSELoss().to(device)
+criteon =nn.SmoothL1Loss().to(device)
 # x_new = x_new.T
 g = 0
 m = 0
