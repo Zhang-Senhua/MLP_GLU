@@ -37,14 +37,14 @@ test_loss_select=0
 flag=0
 batch_size =80
 learning_rate = 0.0001
-epochs =2000
+epochs =500
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")#device = torch.device('cpu')#('cuda:0')
 print(device)
 file_flag='RES_MUTUAL'
 the = 0.1
-count_filename = "count.txt"
+count_filename = "model_Mutual_RES_count.txt"
 Dir='Model_RES_MUTUAL/'
-loss_folder='Model_RRES_MUTUAL/loss_RES_MUTUAL/'
+loss_folder='Model_RES_MUTUAL/loss_RES_MUTUAL/'
 model_pkl_folder='Model_RES_MUTUAL/model_pkl_RES_MUTUAL/'
 if not os.path.exists(Dir):  # 如果文件夹不存在
     os.makedirs(Dir)  # 创建文件夹
@@ -61,40 +61,29 @@ if not os.path.exists(count_filename):
 with open(count_filename, "r") as f:
     count = int(f.read())
 # 检查 modelss.txt 文件是否存在，如果不存在则创建
-if not os.path.isfile('model_mutual_RES_X_Y.txt'):
-    open('model_mutual_RES_X_Y.txt', 'w').close()
+if not os.path.isfile('model_Mutual_RES_X_Y.txt'):
+    open('model_Mutual_RES_X_Y.txt', 'w').close()
 # 检查 modelss.txt 文件是否存在，如果不存在则创建
-if not os.path.isfile('model_mutual_RES_Y_X.txt'):
-    open('model_mutual_RES_Y_X.txt', 'w').close()
-if not os.path.isfile('model_mutual_RES_count.txt'):
-    open('model_mutual_RES_count.txt', 'w').close()
-# if count>=1:
-#     # 读取 model.txt 文件的最后一行，获取上次运行的 pkl 文件名
-#     with open('model_mutual_RES_X_Y.txt', 'r') as f:
-#         linesff = f.readlines()
-#         if linesff:
-#             last_lineff = linesff[-1].strip()
-#         else:
-#             last_lineff = ""
-#     # 读取 model.txt 文件的最后一行，获取上次运行的 pkl 文件名
-#     with open('model_mutual_RES_Y_X.txt', 'r') as f:
-#         linescc = f.readlines()
-#         if linescc:
-#             last_linecc = linescc[-1].strip()
-#         else:
-#             last_linecc = ""
-with open('model_Y_to_X_RES.txt', 'r') as f:
-        linescc = f.readlines()
-        if linescc:
-            last_linecc = linescc[-1].strip()
-        else:
-            last_linecc = ""        
-with open('model_X_to_Y_RES.txt', 'r') as f:
+if not os.path.isfile('model_Mutual_RES_Y_X.txt'):
+    open('model_Mutual_RES_Y_X.txt', 'w').close()
+if not os.path.isfile('model_Mutual_RES_count.txt'):
+    open('model_Mutual_RES_count.txt', 'w').close()
+if count>=1:
+    # 读取 model.txt 文件的最后一行，获取上次运行的 pkl 文件名
+    with open('model_Mutual_RES_X_TO_Y.txt', 'r') as f:
         linesff = f.readlines()
         if linesff:
             last_lineff = linesff[-1].strip()
         else:
-            last_lineff = ""        
+            last_lineff = ""
+    # 读取 model.txt 文件的最后一行，获取上次运行的 pkl 文件名
+    with open('model_Mutual_RES_Y_TO_X.txt', 'r') as f:
+        linescc = f.readlines()
+        if linescc:
+            last_linecc = linescc[-1].strip()
+        else:
+            last_linecc = ""
+
 l = 1 # 厚度
 d = 6# 直径
 fr = 18500  # 剩余磁场
@@ -112,6 +101,7 @@ l1 = 101
 l = np.size(x,0)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
+
 x = torch.tensor(x, dtype=torch.float32).to(device)
 y = torch.tensor(y, dtype=torch.float32).to(device)  # float32
 
@@ -180,12 +170,12 @@ for epoch in range(epochs):
             loss_location = criteon_location(output,target)
             loss_mag = criteon(predict_1,data)
             loss = loss_location +the* loss_mag
-            #optimizer_mag.zero_grad()
+            optimizer_mag.zero_grad()
             optimizer_location.zero_grad()
             #loss_location.backward(retain_graph=True)
             #loss_mag.backward(retain_graph=True)
             loss.backward(retain_graph=True)
-            #optimizer_mag.step()
+            optimizer_mag.step()
             optimizer_location.step()
             #total_loss = criteon(fin_out,target)
             total_loss = criteon(output, target)
@@ -203,12 +193,12 @@ for epoch in range(epochs):
             loss_location = criteon_location(output,target)
             loss_mag = criteon(predict_1, data)
             loss = loss_location +the* loss_mag
-            #optimizer_mag.zero_grad()
+            optimizer_mag.zero_grad()
             optimizer_location.zero_grad()
             #loss_location.backward(retain_graph=True)
             #loss_mag.backward(retain_graph=True)
             loss.backward(retain_graph=True)
-           # optimizer_mag.step()
+            optimizer_mag.step()
             optimizer_location.step()
             #total_loss = criteon(fin_out,target)
             total_loss = criteon(output, target)
@@ -268,7 +258,7 @@ for epoch in range(epochs):
     epoch_test = np.append(epoch_test, epoch_losstest)
     epoch_test_x = np.append(epoch_test_x, epoch_losstest_x)
     epoch_test_total=np.append(epoch_test_total,epoch_totalloss_test)
-    temp=epoch_totalloss_test   
+    temp=epoch_losstest
     # 读取计数器的当前值
     if(test_loss_select>temp):
             with open(count_filename, "r") as f:
@@ -288,7 +278,7 @@ for epoch in range(epochs):
                     epoch_losstest_x,epoch_losstest,epoch_totalloss_test
                 ))
     if(flag==0):
-        test_loss_select=epoch_totalloss_test 
+        test_loss_select=epoch_losstest
         flag=1  
         
         
@@ -308,10 +298,10 @@ for epoch in range(epochs):
 #     print("没有找到较好的解")
 
     # 在程序运行结束后，将本次运行的 pkl 文件名追加到 model.txt 文件的末尾
-with open('model_Mutual_RES_.txt', 'a') as f:
+with open('model_Mutual_RES_X_TO_Y.txt', 'a') as f:
         f.write(model_pkl_folder+'MUTUAL_X_Y_' + str(learning_rate)+'_' + str(batch_size)+'_' + str(epochs)+'_' + str(count) +'_' + str(the) + '.pkl\n')  # 将 pkl 文件名替换为你的实际文件名
 
-with open('modelcc.txt', 'a') as f:
+with open('model_Mutual_RES_Y_TO_X.txt', 'a') as f:
         f.write(model_pkl_folder+'MUTUAL_Y_X_' + str(learning_rate)+'_' + str(batch_size)+'_' + str(epochs)+'_' + str(count) +'_' + str(the) +  '.pkl\n')
 
 import matplotlib.pyplot as plt
