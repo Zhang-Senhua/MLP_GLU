@@ -32,7 +32,7 @@ hidden_size_position=1024 #隐藏层的节点数量
 hidden_size_position=torch.tensor(hidden_size_position)
 num_layers_position=5#隐藏层数量
 num_layers_position=torch.tensor(num_layers_position)
-
+##s
 test_loss_select=0
 flag=0
 batch_size =80

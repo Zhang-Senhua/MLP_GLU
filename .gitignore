@@ -13,3 +13,8 @@ Model_RES_Y_X/loss_Y_to_X_RES/1e-05_80_2000_0.jpg
 Model_RES_Y_X/loss_Y_to_X_RES/位置误差test1e-05_80_2000_0.txt
 Model_RES_Y_X/loss_Y_to_X_RES/位置误差train1e-05_80_2000_0.txt
 finlf7.1.pkl
+Model_RES_MUTUAL/model_pkl_RES_MUTUAL/MUTUAL_X_Y_0.0001_80_500_1_0.1.pkl
+Model_RES_MUTUAL/model_pkl_RES_MUTUAL/MUTUAL_X_Y_0.0001_80_1000_1_0.1.pkl
+Model_RES_MUTUAL/model_pkl_RES_MUTUAL/MUTUAL_Y_X_0.0001_80_500_1_0.1.pkl
+Model_RES_MUTUAL/model_pkl_RES_MUTUAL/MUTUAL_Y_X_0.0001_80_1000_1_0.1.pkl
+Model_RES_MUTUAL/model_pkl_RES_MUTUAL/MUTUAL_Y_X_0.0001_80_2000_0_0.1.pkl
